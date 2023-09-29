@@ -10,7 +10,7 @@ from rest_framework.authtoken.views import obtain_auth_token
 # API URLS
 urlpatterns = [
     # API base url
-    path("api/", include("config.api_router")),
+    path("api/v1/", include("config.api_router")),
     # DRF auth token
     path("api-auth/", include("rest_framework.urls")),
     path("auth-token/", obtain_auth_token),
@@ -20,6 +20,11 @@ urlpatterns = [
         SpectacularSwaggerView.as_view(url_name="api-schema"),
         name="api-docs",
     ),
+    # Document upload url
+    path("api/v1/upload", include("uploader.urls")),
+    # Document get url, any path the user chooses to see the document in
+    ## doc reference for this setting : https://stackoverflow.com/questions/51084909/how-can-i-use-a-catch-all-route-using-path-or-re-path-so-that-django-passes
+    path("path-resource", include("uploader.urls")),
 ]
 
 if settings.DEBUG:

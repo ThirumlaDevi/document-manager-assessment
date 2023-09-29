@@ -19,7 +19,7 @@ _**File chunking process on file upload**_
 
     Note: efficiently spawning threads to do process 4 and 5 will make the process much faster
 
-  6. Generate a metadata on the stored file with the user, file id, revision, chunk information (chunk order, chunk id ) metastore
+  6. Generate a metadata on the stored file with the user, file id, revision, url location, list of chunk information (each having chunk order & chunk id info ) metastore
 
     Note: on new file upload, make sure to update the cache of file name, user name and revison version with newest revision number
 
