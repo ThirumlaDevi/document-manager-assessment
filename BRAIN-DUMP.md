@@ -41,9 +41,25 @@ _Note: Since metadata file acts as source of truth for file this information nee
 
 One good thing on get if revision number is not given, latest revision number is taken from cache
 
-ACTUALLY NEED TO CHECK HOW TO COMBINE CHUNKS ON ACCESS/DOWNLOAD
+*ACTUALLY NEED TO CHECK HOW TO COMBINE CHUNKS ON ACCESS/DOWNLOAD*
+
 #### How to make querying faster in metadastore
 Introducing indexing on filename to username
+
+#### What information should upload endpoint contain?
+
+creater user id, org id, filename, generated chunkid (having this logic in frontend will save a lot of request bandwidth), chunk
+
+_Note: 
+- later we can even move user information (creater user, org id) to a jwt token which can later be used for permission checks
+- upload url along with order of chunks and chunk id, file revision for a user will be stores as part of file version metadata_
+
+#### What hashing technique to use to check file change
+md5sum on file contents uniquely identifies file contents. Personally checked this in bash using `md5sum` command. Other reference [link1](https://askubuntu.com/questions/53846/how-to-get-the-md5-hash-of-a-string-directly-in-the-terminal), [link2](https://stackoverflow.com/questions/2769461/creating-a-unique-key-based-on-file-content-in-python)
+
+#### What db to use for doc info metadata and for the file chunks itself?
+Postgres -> storing file chunks as it is good for big data storage and retrival, and internal scaling
+Sqlite -> doc meta data (chunks to file revision information) as a more consistent db is require for this
 
 ### Issues not tackled
 - Not making a backup for the data storage or any sort of disaster recovery was simulated in the local development

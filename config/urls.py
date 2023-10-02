@@ -21,10 +21,11 @@ urlpatterns = [
         name="api-docs",
     ),
     # Document upload url
-    path("api/v1/upload", include("uploader.urls")),
+    path("api/v1/docs", include("uploader.urls")),
     # Document get url, any path the user chooses to see the document in
     ## doc reference for this setting : https://stackoverflow.com/questions/51084909/how-can-i-use-a-catch-all-route-using-path-or-re-path-so-that-django-passes
-    path("path-resource", include("uploader.urls")),
+    # path("/api/o", include("uploader.urls")),
+    # # path("<path:resource>", include("uploader.urls")),
 ]
 
 if settings.DEBUG:

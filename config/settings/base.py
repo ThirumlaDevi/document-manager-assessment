@@ -46,9 +46,19 @@ LOCALE_PATHS = [str(BASE_DIR / "locale")]
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
 DATABASES = {
+    # sqlite3 gets downloaded with django, to access it run $pipenv run python manage.py dbshell 
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": "propylon_document_manager.sqlite",
+    },
+    "chunks": {
+        # Django doesn't create databases for you automatically. You have to do this yourself manually.
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "chunk_data",
+        'USER': 'dev', # replace with your username
+        'PASSWORD': 'localDevPassword',
+        'HOST': 'localhost',
+        'PORT': '',  
     }
 }
 # https://docs.djangoproject.com/en/stable/ref/settings/#std:setting-DEFAULT_AUTO_FIELD
@@ -87,8 +97,10 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     "propylon_document_manager.users",
-    # Your stuff: custom apps go here
     "propylon_document_manager.file_versions",
+    
+    # Your stuff: custom apps go here
+    "uploader"
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

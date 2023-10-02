@@ -11,20 +11,41 @@ The Propylon Document Management Technical Assessment is a simple (and incomplet
     - Instructions on how to hook the python version from pipenv over local version (if not 3.11) can be referred [here](https://stackoverflow.com/a/34156303)
 4. [Install npm](https://nodejs.org/en/download/package-manager)
     - This project was tested with npm version 10.1 .
+5. [Install plsql](https://www.postgresql.org/download/) version 12.15
 
 ### How to run application in local
 1. Run `direnv allow` to approve the local `.envrc` variables.
 2. `$ pipenv install -r requirements/local.txt`.  
    - If Python 3.11 is not the default Python version on your system you may need to explicitly create the virtual environment (`$ python3.11 -m venv .venv`) prior to running the install command. 
 3. `$ pipenv run python manage.py makemigrations` to create separate migration files for any model changes
-4. `$ pipenv run python manage.py migrate` to create the database.
-5. `$ pipenv run python manage.py load_file_fixtures` to create the fixture file versions.
-6. `$ pipenv run python manage.py runserver 0.0.0.0:8001` to start the development server on port 8001.
-7. Navigate to the client/doc-manager directory.
-8. `$ npm install` to install the dependencies.
-9. `$ npm start` to start the React development server.
+4. `$ pipenv run python manage.py migrate` to create the database and respective tables in default database
+5. Django doesn't create plsql database automatically, hence follow the following commands in psql command line for local development
+```
+CREATE DATABASE chunk_data;
+CREATE USER dev WITH PASSWORD 'localDevPassword';
+GRANT ALL PRIVILEGES ON DATABASE chunk_data TO dev;
+GRANT insert on chunks to dev;
+GRANT select on chunks to dev;
+ALTER ROLE dev SET timezone TO 'UTC';
+```
+_Note: Grant permission reference https://stackoverflow.com/q/9325017_
+Applying migrations on different databases from the same app is also not supported in django, hence run the following commands too
+```
+CREATE TABLE chunks ( 
+    orgId INTEGER, 
+    userId INTEGER, 
+    chunkId char(34), 
+    created_at_epoc INTEGER,
+    data BYTEA,
+    PRIMARY KEY(orgId, userId, chunkId) );
+```
+6. `$ pipenv run python manage.py load_file_fixtures` to create the fixture file versions.
+7. `$ pipenv run python manage.py runserver 0.0.0.0:8001` to start the development server on port 8001.
+8. Navigate to the client/doc-manager directory.
+9. `$ npm install` to install the dependencies.
+10. `$ npm start` to start the React development server.
 
-_Note: Run step 6,7,9 alone if other setup have been done otherwise and no change has been made to the models/requirement packages for the django and react projects_
+_Note: Run step 7,8,10 alone if other setup have been done otherwise and no change has been made to the models/requirement packages for the django and react projects_
 
 
 [![Built with Cookiecutter Django](https://img.shields.io/badge/built%20with-Cookiecutter%20Django-ff69b4.svg?logo=cookiecutter)](https://github.com/cookiecutter/cookiecutter-django/)
@@ -43,7 +64,23 @@ Moved to [settings](http://cookiecutter-django.readthedocs.io/en/latest/settings
 
 - To create a **superuser account**, use this command:
 
-      $ python manage.py createsuperuser
+      $ pipenv run python manage.py createsuperuser --email <email-id>
+
+### Curl request to upload file chunks
+
+```
+curl -v POST http://0.0.0.0:8001/api/v1/docs -F chunk=@<file-chunk> \
+-H 'details:{"userId":<user-id>,"orgId":<orgid>,"chunkId":<chunk-id>}' 
+```
+
+For example
+```shell
+# command to get chunk id
+md5sum cookie.txt
+# sample upload that will currently work
+curl -v POST http://0.0.0.0:8001/api/v1/docs -F chunk=@cookie.txt \
+-H 'details:{"userId":1,"orgId":1,"chunkId":"9d9121966c738889a7624a8e1954a9c7"}' 
+```
 
 ### Type checks
 
@@ -89,22 +126,11 @@ The user can now retrieve the latest version of the file by accessing the docume
 - Demonstrate functionality that allows a client to retrieve any given version of documentusing a endpoint that implements a Content Addressable Storage mechanism.
 - swagger docs
 - restrict file upload path to not be authentication paths
+- Make sure all endpoints use django rest auth methods
 - check base.py environment file read function ( that might have to be altered)
+- Handling common errors like [this](https://stackoverflow.com/questions/73097147/following-error-raised-templatedoesnotexisttemplate-name-chain-chain-django)
+- Replace harcoded postgres data information with something else
 
-## My Notes
-urls already provided for implementation are as follows
-```
-/api-auth/login/	django.contrib.auth.views.LoginView	rest_framework:login
-/api-auth/logout/	django.contrib.auth.views.LogoutView	rest_framework:logout
-/api/docs/	drf_spectacular.views.SpectacularSwaggerView	api-docs
-/api/schema/	drf_spectacular.views.SpectacularAPIView	api-schema
-/api/v1/file_versions/	propylon_document_manager.file_versions.api.views.FileVersionViewSet	api:fileversion-list
-/api/v1/file_versions/<id>/	propylon_document_manager.file_versions.api.views.FileVersionViewSet	api:fileversion-detail
-/api/v1/users/	propylon_document_manager.users.api.views.UserViewSet	api:user-list
-/api/v1/users/<pk>/	propylon_document_manager.users.api.views.UserViewSet	api:user-detail
-/api/v1/users/me/	propylon_document_manager.users.api.views.UserViewSet	api:user-me
-/auth-token/	rest_framework.authtoken.views.ObtainAuthToken	
-/path-resource	uploader.views.index	index
-/upload	uploader.views.index	index
-```
-
+## Stuff fixed
+- Fix TemplateDoesNotExist due to debug_toolbar
+- the auth part of propylon_document_manager is overwritten for the current uploader endpoint
