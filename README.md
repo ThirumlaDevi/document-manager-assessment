@@ -131,6 +131,6 @@ The user can now retrieve the latest version of the file by accessing the docume
 - Handling common errors like [this](https://stackoverflow.com/questions/73097147/following-error-raised-templatedoesnotexisttemplate-name-chain-chain-django)
 - Replace harcoded postgres data information with something else
 
-## Stuff fixed
+## Existing errors fixed
 - Fix TemplateDoesNotExist due to debug_toolbar
 - the auth part of propylon_document_manager is overwritten for the current uploader endpoint
