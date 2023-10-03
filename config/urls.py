@@ -5,6 +5,7 @@ from django.urls import include, path
 from django.views import defaults as default_views
 from django.views.generic import TemplateView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+from propylon_document_manager.file_versions.api.views import FileInfo
 from rest_framework.authtoken.views import obtain_auth_token
 
 # API URLS
@@ -20,12 +21,14 @@ urlpatterns = [
         SpectacularSwaggerView.as_view(url_name="api-schema"),
         name="api-docs",
     ),
-    # Document upload url
-    path("api/v1/docs", include("uploader.urls")),
-    # Document get url, any path the user chooses to see the document in
-    ## doc reference for this setting : https://stackoverflow.com/questions/51084909/how-can-i-use-a-catch-all-route-using-path-or-re-path-so-that-django-passes
-    # path("/api/o", include("uploader.urls")),
-    # # path("<path:resource>", include("uploader.urls")),
+    # Document chunk upload and get urls
+    path("api/v1/chunks", include("uploader.urls")),
+
+    # Document meta information urls
+    path("api/v1/file_versions", FileInfo.as_view(), name='file-version-view'),
+    path("api/v1/file_versions/<int:versionNumber>", FileInfo.getByRevision, name='file-revision-view'),
+    
+    # Document get url, any path the user chooses to see handle in frontend
 ]
 
 if settings.DEBUG:

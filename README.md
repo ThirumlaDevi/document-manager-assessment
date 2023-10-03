@@ -93,6 +93,7 @@ To run the tests, check your test coverage, and generate an HTML coverage report
 
 ## Curl requests
 
+_Note: TODO - The details object sent in header will be moved to auth key as a JWT token_
 ### Upload file chunks
 
 ```
@@ -170,9 +171,12 @@ https://github.com/shubhamkshatriya25/AJAX-File-Uploader/tree/master
 A user may submit the file "review.pdf" to the application, specifying "/documents/reviews/review.pdf" as the desired URL. The user later submits a new version of the file at the same URL.
 The user can now retrieve the latest version of the file by accessing the document URL ("/documents/reviews/review.pdf"). The original version of the file can be accessed at the URL ("/documents/reviews/review.pdf?revision=0").
 - PUT call to same doc version
+- The details object sent in header moved it auth key as a JWT token and use this token for auth
 - Add try catch when trying to get information from request
 - Does not allow interaction by non-authenticated users
+    - reference --> https://medium.com/django-rest/django-rest-framework-login-and-register-user-fd91cf6029d5
 - Does not allow a user to access files submitted by another user
+- Fix Django CSRF Cookie Not Set (refrence -> https://stackoverflow.com/questions/17716624/django-csrf-cookie-not-set)
 - Allows users to store multiple revisions of the same file at the same URL
 - Allows users to fetch any revision of any file
 - Demonstrate functionality that allows a client to retrieve any given version of documentusing a endpoint that implements a Content Addressable Storage mechanism.
@@ -181,7 +185,7 @@ The user can now retrieve the latest version of the file by accessing the docume
 - Make sure all endpoints use django rest auth methods
 - check base.py environment file read function ( that might have to be altered)
 - Handling common errors like [this](https://stackoverflow.com/questions/73097147/following-error-raised-templatedoesnotexisttemplate-name-chain-chain-django)
-- Replace harcoded postgres data information with something else
+- Replace harcoded postgres data information with information taken form a external file
 
 ## Existing errors fixed
 - Fix TemplateDoesNotExist due to debug_toolbar
