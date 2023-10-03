@@ -59,7 +59,41 @@ md5sum on file contents uniquely identifies file contents. Personally checked th
 
 #### What db to use for doc info metadata and for the file chunks itself?
 Postgres -> storing file chunks as it is good for big data storage and retrival, and internal scaling
+_Note: dynamodb just lets you store file data and not anyother data along with it, for this current system, just a file storage alone is not enough_
 Sqlite -> doc meta data (chunks to file revision information) as a more consistent db is require for this
+
+#### How Tables will look initial design?
+
+*chunks*
+____________________________________________________
+| orgid | userid | chunkid | created_at_epoc | data |
+|___________________________________________________|
+PK - (orgid, userid, chunkid)
+
+*file versions*
+_Note: this doesn't follow BCNF, hence move version number to chunk information table and we are good_
+_________________________________________________________________
+| id | orgid | userid | version_number | created_at_epoc | url   |
+|________________________________________________________________|
+
+*chunk information*   
+____________________________
+|file_version_id | details |
+|__________________________|
+_Note: introduce index on file_version_id field to improve faster querying for a file in a url for a particular user in the chunk information table
+
+#### chunk information detail contract
+
+chunk contract
+[{
+  id : <chunk-id>
+  order : <chunk-order>
+}, 
+..]
+
+#### how to differentiate file upload with existing file version update
+- one obvious way is to do a put call of file version updates
+- post on new file
 
 ### Issues not tackled
 - Not making a backup for the data storage or any sort of disaster recovery was simulated in the local development

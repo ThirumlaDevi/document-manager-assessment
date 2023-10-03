@@ -17,8 +17,10 @@ The Propylon Document Management Technical Assessment is a simple (and incomplet
 1. Run `direnv allow` to approve the local `.envrc` variables.
 2. `$ pipenv install -r requirements/local.txt`.  
    - If Python 3.11 is not the default Python version on your system you may need to explicitly create the virtual environment (`$ python3.11 -m venv .venv`) prior to running the install command. 
-3. `$ pipenv run python manage.py makemigrations` to create separate migration files for any model changes
-4. `$ pipenv run python manage.py migrate` to create the database and respective tables in default database
+3. `$ pipenv run python manage.py makemigrations file_version` to create separate migration files for any model changes
+4. Create the database and respective tables in the default sqlite3 database using following commands:
+`$ pipenv run python manage.py migrate file_versions` 
+
 5. Django doesn't create plsql database automatically, hence follow the following commands in psql command line for local development
 ```
 CREATE DATABASE chunk_data;
@@ -82,6 +84,8 @@ curl -v POST http://0.0.0.0:8001/api/v1/docs -F chunk=@cookie.txt \
 -H 'details:{"userId":1,"orgId":1,"chunkId":"9d9121966c738889a7624a8e1954a9c7"}' 
 ```
 
+### Curl request to upload file chunk details
+
 ### Type checks
 
 Running type checks with mypy:
@@ -108,11 +112,8 @@ To run the tests, check your test coverage, and generate an HTML coverage report
 ## Todo
 - ~~Change debug as not true in local.py~~
 - ~~Fix errors when running project in local~~
-- File currently uses base settings and not local settings
- passing config.settings.local didn't even host up the file (noob)
- DJANGO_SETTINGS_MODULE=myapp.production_settings
-- Stores files of any type and name
-Uniqueness of name is specific to a user 
+- ~~File currently uses base settings and not local settings passing config.settings.local didn't even host up the file (noob) DJANGO_SETTINGS_MODULE=myapp.production_settings~~
+- Stores files of any type and name Uniqueness of name is specific to a user 
 Make file upload work in both backend post and frontend
 reference https://dev.to/shubhamkshatriya25/ajax-file-upload-in-chunks-using-django-with-a-progress-bar-4nhi
 https://github.com/shubhamkshatriya25/AJAX-File-Uploader/tree/master
@@ -134,3 +135,8 @@ The user can now retrieve the latest version of the file by accessing the docume
 ## Existing errors fixed
 - Fix TemplateDoesNotExist due to debug_toolbar
 - the auth part of propylon_document_manager is overwritten for the current uploader endpoint
+- No DjangoTemplates backend is configured
+- Unique constraint failure on Migration when new columns are added. 
+    - Reference -> https://stackoverflow.com/a/50456186
+
+

@@ -57,8 +57,3 @@ def updateDB(chunkDetails, chunk):
     cur.close()
     conn.close()
     return isTransactionSuccessful
-
-@csrf_exempt
-@renderer_classes((TemplateHTMLRenderer, JSONRenderer))
-def other(request):
-    return {}

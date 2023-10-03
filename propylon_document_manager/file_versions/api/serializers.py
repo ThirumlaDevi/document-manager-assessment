@@ -1,8 +1,8 @@
 from rest_framework import serializers
 
-from file_versions.models import FileVersion
+from file_versions.models import File
 
 class FileVersionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = FileVersion
+        model = File
         fields = "__all__"

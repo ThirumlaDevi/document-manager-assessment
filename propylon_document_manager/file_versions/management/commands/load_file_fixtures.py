@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from file_versions.models import FileVersion
+from file_versions.models import File
 
 file_versions = [
     'bill_document',
