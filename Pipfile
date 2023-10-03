@@ -18,7 +18,7 @@ django-crispy-forms = "==2.0"
 crispy-bootstrap5 = "==0.7"
 django-redis = "==5.2.0"
 djangorestframework = "==3.14.0"
-django-cors-headers = "==4.0.0"
+django-cors-headers = "*"
 drf-spectacular = "==0.26.2"
 ipdb = "==0.13.13"
 psycopg2-binary = "==2.9.6"
@@ -42,6 +42,7 @@ django-coverage-plugin = "==3.0.0"
 pytest-django = "==4.5.2"
 
 [dev-packages]
+django-cors-headers = "4.2.0"
 
 [requires]
 python_version = "3.11"

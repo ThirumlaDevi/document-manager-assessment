@@ -68,24 +68,6 @@ Moved to [settings](http://cookiecutter-django.readthedocs.io/en/latest/settings
 
       $ pipenv run python manage.py createsuperuser --email <email-id>
 
-### Curl request to upload file chunks
-
-```
-curl -v POST http://0.0.0.0:8001/api/v1/docs -F chunk=@<file-chunk> \
--H 'details:{"userId":<user-id>,"orgId":<orgid>,"chunkId":<chunk-id>}' 
-```
-
-For example
-```shell
-# command to get chunk id
-md5sum cookie.txt
-# sample upload that will currently work
-curl -v POST http://0.0.0.0:8001/api/v1/docs -F chunk=@cookie.txt \
--H 'details:{"userId":1,"orgId":1,"chunkId":"9d9121966c738889a7624a8e1954a9c7"}' 
-```
-
-### Curl request to upload file chunk details
-
 ### Type checks
 
 Running type checks with mypy:
@@ -108,18 +90,87 @@ To run the tests, check your test coverage, and generate an HTML coverage report
 #### Running tests with pytest
 
     $ pytest
+
+## Curl requests
+
+### Upload file chunks
+
+```
+curl -v POST http://0.0.0.0:8001/api/v1/chunks -F chunk=@<file-chunk> \
+-H 'details:{"userId":<user-id>,"orgId":<orgid>,"chunkId":<chunk-id>}' 
+```
+
+For example
+```shell
+# command to get chunk id
+md5sum cookie.txt # using existing cookie.txt file from the project
+# sample upload that will currently work
+curl -v POST http://0.0.0.0:8001/api/v1/chunks -F chunk=@cookie.txt \
+-H 'details:{"userId":3,"orgId":1,"chunkId":"9d9121966c738889a7624a8e1954a9c7"}' 
+```
+_Note: Reference on how to split and send file to backend https://www.baeldung.com/linux/curl-transfer-big-files#splitting-large-files_
+
+### get by chunk id
+```shell
+curl -v http://0.0.0.0:8001/api/v1/chunks/<chunk-id> \
+-H 'details:{"userId":<user-id>,"orgId":<orgid>}' 
+```
+
+For example
+```shell
+curl -v http://0.0.0.0:8001/api/v1/chunks/9d9121966c738889a7624a8e1954a9c7 \
+-H 'details:{"userId":1,"orgId":1}' 
+```
+
+### upload file chunk details/meta
+
+```shell
+curl -v POST http://0.0.0.0:8001/api/v1/file_versions \
+-d '{"user_id":1,"org_id":1,"url":<doc url>,"version_number":<doc version>, "created_at":"	
+<UTC date time>, "details":[{"chunk_id":"<chunk-id>", "chunk_order":"<chunk-order>"}]}' 
+```
+
+For example
+```shell
+curl -v POST http://0.0.0.0:8001/api/v1/file_versions \
+-d '{"user_id":1,"org_id":1,"url":"/radom/path/cookie.txt","version_number":0, "created_at":"	2023-10-03T11:41:24Z", "details":[{"chunk_id":"9d9121966c738889a7624a8e1954a9c7", "chunk_order":"0"}]}' 
+```
+
+### get all file version information of a file url
+```
+curl -v  http://0.0.0.0:8001/api/v1/file_versions?url=<doc-url>
+```
+
+For example
+```shell
+curl -v  http://0.0.0.0:8001/api/v1/file_versions?url=/radom/path/cookie.txt \
+-H 'details:{"userId":1,"orgId":1}'
+```
+
+### get doc details of a particular revision of a file url
+```
+curl -v  http://0.0.0.0:8001/api/v1/file_versions/<version-number>?url=<doc-url>
+```
+
+For example
+```shell
+curl -v  http://0.0.0.0:8001/api/v1/file_versions/0?url=/radom/path/cookie.txt \
+-H 'details:{"userId":1,"orgId":1}' 
+```
  
 ## Todo
 - ~~Change debug as not true in local.py~~
 - ~~Fix errors when running project in local~~
 - ~~File currently uses base settings and not local settings passing config.settings.local didn't even host up the file (noob) DJANGO_SETTINGS_MODULE=myapp.production_settings~~
-- Stores files of any type and name Uniqueness of name is specific to a user 
-Make file upload work in both backend post and frontend
+- ~~Stores files of any type and url Uniqueness of name is specific to a user~~
+- ~~Make file upload work in both backend post and frontend~~
 reference https://dev.to/shubhamkshatriya25/ajax-file-upload-in-chunks-using-django-with-a-progress-bar-4nhi
 https://github.com/shubhamkshatriya25/AJAX-File-Uploader/tree/master
-- Stores files at any URL
+- ~~Stores files at any URL~~
 A user may submit the file "review.pdf" to the application, specifying "/documents/reviews/review.pdf" as the desired URL. The user later submits a new version of the file at the same URL.
 The user can now retrieve the latest version of the file by accessing the document URL ("/documents/reviews/review.pdf"). The original version of the file can be accessed at the URL ("/documents/reviews/review.pdf?revision=0").
+- PUT call to same doc version
+- Add try catch when trying to get information from request
 - Does not allow interaction by non-authenticated users
 - Does not allow a user to access files submitted by another user
 - Allows users to store multiple revisions of the same file at the same URL
@@ -134,9 +185,11 @@ The user can now retrieve the latest version of the file by accessing the docume
 
 ## Existing errors fixed
 - Fix TemplateDoesNotExist due to debug_toolbar
+    - Reference -> https://stackoverflow.com/a/54759942
 - the auth part of propylon_document_manager is overwritten for the current uploader endpoint
 - No DjangoTemplates backend is configured
 - Unique constraint failure on Migration when new columns are added. 
     - Reference -> https://stackoverflow.com/a/50456186
-
-
+- Request header field … is not allowed by Access-Control-Allow-Headers in preflight response
+    - Reference -> https://stackoverflow.com/questions/45118468/request-header-field-is-not-allowed-by-access-control-allow-headers-in-preflig
+- 

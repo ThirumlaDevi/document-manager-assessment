@@ -62,7 +62,15 @@ Postgres -> storing file chunks as it is good for big data storage and retrival,
 _Note: dynamodb just lets you store file data and not anyother data along with it, for this current system, just a file storage alone is not enough_
 Sqlite -> doc meta data (chunks to file revision information) as a more consistent db is require for this
 
+### What must be each chunk size
+The max size of blob (bytea) storage in postgres is 1GB. [Reference](https://www.postgresql.org/docs/7.4/jdbc-binary-data.html#:~:text=The%20bytea%20data%20type%20is,process%20such%20a%20large%20value.)
+
+However in the document itself storing such a huge file size is not recommended, because of the amount of internal overhead this has. This data types used a in memory [TOAST Storage](https://www.postgresql.org/docs/current/storage-toast.html) which adds overhead of 4 bytes over a certain amount. [Reference](https://dba.stackexchange.com/a/69807)
+
+Since performance is a exponential factor to load on system (traffic and resource) a random 4Mb is taken as chunksize and this can be changed with a performance check on postgres and on the service itself.
+
 #### How Tables will look initial design?
+I've made sure all tables follow BCNF
 
 *chunks*
 ____________________________________________________
@@ -70,16 +78,15 @@ ____________________________________________________
 |___________________________________________________|
 PK - (orgid, userid, chunkid)
 
-*file versions*
-_Note: this doesn't follow BCNF, hence move version number to chunk information table and we are good_
-_________________________________________________________________
-| id | orgid | userid | version_number | created_at_epoc | url   |
-|________________________________________________________________|
+*file*
+_________________________________________________
+| id | orgid | userid | created_at_epoc | url   |
+|________________________________________________
 
-*chunk information*   
-____________________________
-|file_version_id | details |
-|__________________________|
+*file version information*   
+_____________________________________________
+|file_version_id | version_number | details |
+|___________________________________________|
 _Note: introduce index on file_version_id field to improve faster querying for a file in a url for a particular user in the chunk information table
 
 #### chunk information detail contract

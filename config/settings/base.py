@@ -319,3 +319,5 @@ SPECTACULAR_SETTINGS = {
 }
 # Your stuff...
 # ------------------------------------------------------------------------------
+
+APPEND_SLASH=False #URL doesn't end in a slash and you have APPEND_SLASH set.

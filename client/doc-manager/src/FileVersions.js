@@ -32,9 +32,10 @@ function FileVersions() {
   }, []);
   return (
     <div>
-      <h1>Found {data.length} File Versions</h1>
+      <h1>Uploaded Files</h1>
+      <h3>Found {data.length} File Versions</h3>
       <div>
-        <FileVersionsList file_versions={data} />h
+        <FileVersionsList file_versions={data} />
       </div>
     </div>
   );
